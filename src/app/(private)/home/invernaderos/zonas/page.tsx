@@ -9,92 +9,160 @@ export default function ZonasPage() {
   const id_invernadero = searchParams.get("id_invernadero") || "1";
 
   const [zonas, setZonas] = useState([
-    { id: 1, nombre: "Zona Norte", descripciones_add: "Tomates y pimientos" },
-    { id: 2, nombre: "Zona Sur", descripciones_add: "Lechugas y espinacas" },
+    {
+      id: 1,
+      nombre: "Zona Norte",
+      descripciones_add: "Tomates y pimientos",
+      estado: "activo",
+    },
+    {
+      id: 2,
+      nombre: "Zona Sur",
+      descripciones_add: "Lechugas y espinacas",
+      estado: "inactivo",
+    },
   ]);
 
   const [form, setForm] = useState({ nombre: "", descripciones_add: "" });
   const [modalOpen, setModalOpen] = useState(false);
+  const [menuOpenId, setMenuOpenId] = useState<number | null>(null);
 
   const crearZona = () => {
     const nueva = {
       id: Date.now(),
-      ...form,
+      nombre: form.nombre,
+      descripciones_add: form.descripciones_add,
+      estado: "activo",
     };
     setZonas([...zonas, nueva]);
     setForm({ nombre: "", descripciones_add: "" });
     setModalOpen(false);
   };
 
-  const eliminar = (id: number) => {
-    setZonas(zonas.filter((z) => z.id !== id));
+  const cambiarEstado = (id: number, nuevoEstado: string) => {
+    setZonas((prev) =>
+      prev.map((zona) =>
+        zona.id === id ? { ...zona, estado: nuevoEstado } : zona
+      )
+    );
+    setMenuOpenId(null);
   };
 
   return (
-    <main className="p-6 bg-gray-50 min-h-screen font-body text-body"> {/* Usando bg-gray-50 y añadiendo font-body, text-body */}
-      <h1 className="text-2xl font-bold text-darkGreen-700 mb-6"> {/* Usando text-darkGreen-700 */}
-        Zonas del Invernadero {id_invernadero}
+    <main className="p-6 bg-gray-50 min-h-screen">
+      <h1 className="text-3xl font-bold text-green-800 mb-8">
+        Zonas del Invernadero #{id_invernadero}
       </h1>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {zonas.map((zona) => (
-          <div key={zona.id} className="bg-white p-4 rounded-md shadow-green border border-gray-800 border-opacity-10"> {/* Usando shadow-green y border-gray-800 con opacidad */}
-            <h2 className="text-lg font-semibold text-darkGreen-700">{zona.nombre}</h2> {/* Usando text-darkGreen-700 */}
-            <p className="text-gray-800 text-sm">{zona.descripciones_add}</p> {/* Usando text-gray-800 */}
+          <div
+            key={zona.id}
+            className="bg-white rounded-xl shadow-md p-5 border border-gray-200 relative flex flex-col gap-2"
+          >
+            <div className="flex justify-between items-start">
+              <h2 className="text-xl font-semibold text-green-700">{zona.nombre}</h2>
+              <div className="relative">
+                <button
+                  onClick={() =>
+                    setMenuOpenId((prev) => (prev === zona.id ? null : zona.id))
+                  }
+                  className="text-gray-600 hover:text-gray-800"
+                >
+                  ⋮
+                </button>
+                {menuOpenId === zona.id && (
+                  <div className="absolute right-0 mt-2 bg-white border shadow rounded-md z-50">
+                    <button
+                      onClick={() => cambiarEstado(zona.id, "activo")}
+                      className="block w-full px-4 py-2 text-left hover:bg-gray-100"
+                    >
+                      Activar
+                    </button>
+                    <button
+                      onClick={() => cambiarEstado(zona.id, "inactivo")}
+                      className="block w-full px-4 py-2 text-left hover:bg-gray-100"
+                    >
+                      Inactivar
+                    </button>
+                    <button
+                      onClick={() => cambiarEstado(zona.id, "mantenimiento")}
+                      className="block w-full px-4 py-2 text-left hover:bg-gray-100"
+                    >
+                      En mantenimiento
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <p className="text-sm text-gray-600">{zona.descripciones_add}</p>
+            <p className="text-sm text-gray-700">
+              Estado:{" "}
+              <span className="font-semibold uppercase">{zona.estado}</span>
+            </p>
+            <p className="text-xs text-gray-500">Invernadero ID: {id_invernadero}</p>
+
             <div className="flex justify-between mt-4">
               <Link
                 href={`/home/invernaderos/zonas/programacion-riego?id=${zona.id}`}
-                className="bg-green-500 text-white px-3 py-1 rounded-md hover:bg-darkGreen-700 transition duration-200" // Usando bg-green-500 y hover:bg-darkGreen-700
+                className="bg-green-500 text-white px-4 py-1 rounded-md hover:bg-green-600 text-sm"
               >
                 Riego
               </Link>
               <Link
                 href={`/home/invernaderos/zonas/programacion-iluminacion?id=${zona.id}`}
-                className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition duration-200" // blue-500 y blue-600 no estaban en tu CSS, se mantienen como Tailwind predeterminado
+                className="bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-600 text-sm"
               >
                 Iluminación
               </Link>
-              <button
-                onClick={() => eliminar(zona.id)}
-                className="bg-pink-500 text-white px-3 py-1 rounded-md hover:bg-pinkSecondary-900 transition duration-200" // Usando bg-pink-500 y hover:bg-pinkSecondary-900
-              >
-                Eliminar
-              </button>
             </div>
           </div>
         ))}
       </div>
 
-      <button
-        onClick={() => setModalOpen(true)}
-        className="mt-8 bg-green-500 text-white px-6 py-3 rounded-full shadow-green hover:bg-darkGreen-700 transition duration-200" // Usando bg-green-500, shadow-green y hover:bg-darkGreen-700, rounded-full
-      >
-        Crear Zona
-      </button>
+      {/* Botón de crear zona */}
+      <div className="mt-10 flex justify-center">
+        <button
+          onClick={() => setModalOpen(true)}
+          className="bg-green-500 hover:bg-green-600 text-white font-bold px-6 py-3 rounded-full transition"
+        >
+          Crear Zona
+        </button>
+      </div>
 
+      {/* Modal de creación */}
       {modalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md"> {/* rounded-lg y shadow-lg no estaban en tu CSS, se mantienen como Tailwind predeterminado */}
-            <h2 className="text-xl font-semibold text-darkGreen-700 mb-4">Nueva Zona</h2> {/* Usando text-darkGreen-700 */}
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 px-4">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h2 className="text-2xl font-semibold text-green-700 mb-4">Nueva Zona</h2>
 
             <input
               placeholder="Nombre"
               value={form.nombre}
               onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-              className="w-full border border-gray-800 border-opacity-20 p-2 rounded-md mb-3 focus:outline-none focus:border-green-500 transition duration-200 placeholder-gray-400" // Usando border-gray-800 y focus:border-green-500, placeholder-gray-400
+              className="w-full border border-gray-300 p-2 rounded mb-3"
             />
             <textarea
               placeholder="Descripción"
               value={form.descripciones_add}
-              onChange={(e) => setForm({ ...form, descripciones_add: e.target.value })}
-              className="w-full border border-gray-800 border-opacity-20 p-2 rounded-md mb-4 focus:outline-none focus:border-green-500 transition duration-200 placeholder-gray-400" // Usando border-gray-800 y focus:border-green-500, placeholder-gray-400
+              onChange={(e) =>
+                setForm({ ...form, descripciones_add: e.target.value })
+              }
+              className="w-full border border-gray-300 p-2 rounded mb-4"
             />
 
             <div className="flex justify-end gap-2">
-              <button onClick={() => setModalOpen(false)} className="bg-gray-400 px-4 py-2 rounded-md hover:bg-gray-500 transition duration-200"> {/* Usando bg-gray-400 y hover:bg-gray-500 */}
+              <button
+                onClick={() => setModalOpen(false)}
+                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+              >
                 Cancelar
               </button>
-              <button onClick={crearZona} className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-darkGreen-700 transition duration-200"> {/* Usando bg-green-500 y hover:bg-darkGreen-700 */}
+              <button
+                onClick={crearZona}
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+              >
                 Crear
               </button>
             </div>
