@@ -14,16 +14,23 @@ export default function ZonasPage() {
       nombre: "Zona Norte",
       descripciones_add: "Tomates y pimientos",
       estado: "activo",
-    },
-    {
-      id: 2,
-      nombre: "Zona Sur",
-      descripciones_add: "Lechugas y espinacas",
-      estado: "inactivo",
+      id_cultivo: null,
     },
   ]);
 
-  const [form, setForm] = useState({ nombre: "", descripciones_add: "" });
+  // Cultivos simulados
+  const cultivosDisponibles = [
+    { id: 1, nombre_cultivo: "Tomate" },
+    { id: 2, nombre_cultivo: "Lechuga" },
+    { id: 3, nombre_cultivo: "Pimiento" },
+  ];
+
+  const [form, setForm] = useState({
+    nombre: "",
+    descripciones_add: "",
+    id_cultivo: "",
+  });
+
   const [modalOpen, setModalOpen] = useState(false);
   const [menuOpenId, setMenuOpenId] = useState<number | null>(null);
 
@@ -33,9 +40,11 @@ export default function ZonasPage() {
       nombre: form.nombre,
       descripciones_add: form.descripciones_add,
       estado: "activo",
+      id_cultivo: form.id_cultivo || null,
     };
+
     setZonas([...zonas, nueva]);
-    setForm({ nombre: "", descripciones_add: "" });
+    setForm({ nombre: "", descripciones_add: "", id_cultivo: "" });
     setModalOpen(false);
   };
 
@@ -102,6 +111,14 @@ export default function ZonasPage() {
               <span className="font-semibold uppercase">{zona.estado}</span>
             </p>
             <p className="text-xs text-gray-500">Invernadero ID: {id_invernadero}</p>
+            {zona.id_cultivo && (
+              <p className="text-xs text-gray-700">
+                Cultivo asignado:{" "}
+                {
+                  cultivosDisponibles.find((c) => c.id.toString() === zona.id_cultivo)?.nombre_cultivo
+                }
+              </p>
+            )}
 
             <div className="flex justify-between mt-4">
               <Link
@@ -149,8 +166,22 @@ export default function ZonasPage() {
               onChange={(e) =>
                 setForm({ ...form, descripciones_add: e.target.value })
               }
-              className="w-full border border-gray-300 p-2 rounded mb-4"
+              className="w-full border border-gray-300 p-2 rounded mb-3"
             />
+
+            {/* Select de cultivo */}
+            <select
+              value={form.id_cultivo}
+              onChange={(e) => setForm({ ...form, id_cultivo: e.target.value })}
+              className="w-full border border-gray-300 p-2 rounded mb-4"
+            >
+              <option value="">-- Sin cultivo --</option>
+              {cultivosDisponibles.map((cultivo) => (
+                <option key={cultivo.id} value={cultivo.id}>
+                  {cultivo.nombre_cultivo}
+                </option>
+              ))}
+            </select>
 
             <div className="flex justify-end gap-2">
               <button
