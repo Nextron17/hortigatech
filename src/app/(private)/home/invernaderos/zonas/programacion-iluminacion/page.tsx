@@ -37,6 +37,10 @@ export default function ProgramacionIluminacion() {
     setForm({ activacion: "", desactivacion: "", descripcion: "" });
     setModalOpen(false);
   };
+  const detener = (id: number) => {
+    alert("Riego detenido para la programación #" + id);
+    // Aquí puedes agregar lógica real si tienes sensores o backend
+  };
 
   const eliminar = (id: number) => {
     setProgramaciones(programaciones.filter((p) => p.id !== id));
@@ -65,10 +69,16 @@ export default function ProgramacionIluminacion() {
               <p className="text-gray-400">
                 Descripción: <span className="text-gray-800">{p.descripcion}</span>
               </p>
-              <div className="flex justify-end mt-4 pt-4 border-t border-gray-800 border-opacity-10">
+              <div className="flex justify-between gap-2 mt-4 pt-4 border-t border-gray-800 border-opacity-10">
+                <button
+                  onClick={() => detener(p.id)}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-full transition duration-200"
+                >
+                  Detener
+                </button>
                 <button
                   onClick={() => eliminar(p.id)}
-                  className="bg-pink-500 hover:bg-pinkSecondary-900 text-white font-bold py-2 px-5 rounded-full transition duration-200 ease-in-out"
+                  className="bg-pink-500 hover:bg-pinkSecondary-900 text-white font-bold py-2 px-4 rounded-full transition duration-200"
                 >
                   Eliminar
                 </button>

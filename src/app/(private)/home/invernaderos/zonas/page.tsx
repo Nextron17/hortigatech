@@ -17,6 +17,17 @@ export default function ZonasPage() {
       id_cultivo: null,
     },
   ]);
+  const [zonaEditando, setZonaEditando] = useState<any>(null);
+
+const guardarEdicion = () => {
+  setZonas((prev) =>
+    prev.map((z) =>
+      z.id === zonaEditando.id ? zonaEditando : z
+    )
+  );
+  setZonaEditando(null);
+};
+
 
   // Cultivos simulados
   const cultivosDisponibles = [
@@ -65,6 +76,7 @@ export default function ZonasPage() {
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {zonas.map((zona) => (
+          
           <div
             key={zona.id}
             className="bg-white rounded-xl shadow-md p-5 border border-gray-200 relative flex flex-col gap-2"
@@ -133,6 +145,13 @@ export default function ZonasPage() {
               >
                 Iluminación
               </Link>
+              <button
+                onClick={() => setZonaEditando(zona)}
+                className="bg-blue- text-blue-700 px-4 py-1 rounded-md hover:bg-blue-600 text-sm"
+              >
+                Editar
+              </button>
+
             </div>
           </div>
         ))}
@@ -200,6 +219,67 @@ export default function ZonasPage() {
           </div>
         </div>
       )}
+      {/* Modal de edición */}
+{zonaEditando && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 px-4">
+    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+      <h2 className="text-2xl font-semibold text-green-700 mb-4">Editar Zona</h2>
+
+      <input
+        placeholder="Nombre"
+        value={zonaEditando.nombre}
+        onChange={(e) =>
+          setZonaEditando({ ...zonaEditando, nombre: e.target.value })
+        }
+        className="w-full border border-gray-300 p-2 rounded mb-3"
+      />
+      <textarea
+        placeholder="Descripción"
+        value={zonaEditando.descripciones_add}
+        onChange={(e) =>
+          setZonaEditando({
+            ...zonaEditando,
+            descripciones_add: e.target.value,
+          })
+        }
+        className="w-full border border-gray-300 p-2 rounded mb-3"
+      />
+
+      <select
+        value={zonaEditando.id_cultivo || ""}
+        onChange={(e) =>
+          setZonaEditando({
+            ...zonaEditando,
+            id_cultivo: e.target.value,
+          })
+        }
+        className="w-full border border-gray-300 p-2 rounded mb-4"
+      >
+        <option value="">-- Sin cultivo --</option>
+        {cultivosDisponibles.map((cultivo) => (
+          <option key={cultivo.id} value={cultivo.id}>
+            {cultivo.nombre_cultivo}
+          </option>
+        ))}
+      </select>
+
+      <div className="flex justify-end gap-2">
+        <button
+          onClick={() => setZonaEditando(null)}
+          className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500"
+        >
+          Cancelar
+        </button>
+        <button
+          onClick={guardarEdicion}
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </main>
   );
 }

@@ -13,7 +13,7 @@ export default function ProgramacionRiego() {
       activacion: "2025-06-22T06:00",
       desactivacion: "2025-06-22T07:00",
       descripcion: "Riego de la mañana",
-      tipo_riego: "aspersión",
+      tipo_riego: "Aspersión",
       zona_id: zonaId,
     },
   ]);
@@ -44,6 +44,11 @@ export default function ProgramacionRiego() {
     setProgramaciones(programaciones.filter((p) => p.id !== id));
   };
 
+  const detener = (id: number) => {
+    alert("Riego detenido para la programación #" + id);
+    // Aquí puedes agregar lógica real si tienes sensores o backend
+  };
+
   return (
     <main className="container mx-auto py-12 px-4 sm:px-6 lg:px-8 bg-gray-50 min-h-screen">
       <h1 className="text-5xl font-bold text-darkGreen-900 mb-8 text-center md:text-left">
@@ -59,21 +64,34 @@ export default function ProgramacionRiego() {
               className="bg-white rounded-2xl shadow-green p-6 flex flex-col gap-4"
             >
               <p className="text-lg font-semibold text-greenSecondary-900">
-                Activación: <span className="font-normal text-darkGreen-700">{p.activacion.replace("T", " ")}</span>
+                Activación:{" "}
+                <span className="font-normal text-darkGreen-700">
+                  {p.activacion.replace("T", " ")}
+                </span>
               </p>
               <p className="text-lg font-semibold text-greenSecondary-900">
-                Desactivación: <span className="font-normal text-darkGreen-700">{p.desactivacion.replace("T", " ")}</span>
+                Desactivación:{" "}
+                <span className="font-normal text-darkGreen-700">
+                  {p.desactivacion.replace("T", " ")}
+                </span>
               </p>
               <p className="text-gray-400">
-                Descripción: <span className="text-gray-800">{p.descripcion}</span>
+                Descripción:{" "}
+                <span className="text-gray-800">{p.descripcion}</span>
               </p>
               <p className="text-sm text-darkGreen-900 font-medium">
                 Tipo: <span className="text-darkGreen-700">{p.tipo_riego}</span>
               </p>
-              <div className="flex justify-end mt-4 pt-4 border-t border-gray-800 border-opacity-10">
+              <div className="flex justify-between gap-2 mt-4 pt-4 border-t border-gray-800 border-opacity-10">
+                <button
+                  onClick={() => detener(p.id)}
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-full transition duration-200"
+                >
+                  Detener
+                </button>
                 <button
                   onClick={() => eliminar(p.id)}
-                  className="bg-pink-500 hover:bg-pinkSecondary-900 text-white font-bold py-2 px-5 rounded-full transition duration-200 ease-in-out"
+                  className="bg-pink-500 hover:bg-pinkSecondary-900 text-white font-bold py-2 px-4 rounded-full transition duration-200"
                 >
                   Eliminar
                 </button>
@@ -114,13 +132,16 @@ export default function ProgramacionRiego() {
               onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
               className="w-full p-3 mb-4 border border-gray-800 border-opacity-20 rounded-md"
             />
-            <input
-              type="text"
-              placeholder="Tipo de riego"
+            <select
               value={form.tipo_riego}
               onChange={(e) => setForm({ ...form, tipo_riego: e.target.value })}
               className="w-full p-3 mb-6 border border-gray-800 border-opacity-20 rounded-md"
-            />
+            >
+              <option value="">Selecciona el tipo de riego</option>
+              <option value="Goteo">Goteo</option>
+              <option value="Aspersión">Aspersión</option>
+              <option value="Manual">Manual</option>
+            </select>
             <div className="flex justify-end gap-4">
               <button
                 onClick={() => setModalOpen(false)}

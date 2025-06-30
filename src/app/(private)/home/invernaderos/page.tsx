@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 export default function InvernaderosPage() {
   const [invernaderos, setInvernaderos] = useState([
@@ -35,17 +36,29 @@ export default function InvernaderosPage() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [menuOpenId, setMenuOpenId] = useState<number | null>(null);
+  const [busquedaResponsable, setBusquedaResponsable] = useState("");
+
+  const responsables = [
+    { id: 1, nombre: "Carlos Pérez", rol: "admin", activo: true },
+    { id: 2, nombre: "Laura Gómez", rol: "operario", activo: true },
+    { id: 3, nombre: "Andrés Díaz", rol: "admin", activo: false },
+    { id: 4, nombre: "Marcela Ruiz", rol: "operario", activo: true },
+  ];
+
+  const filtrados = responsables.filter(
+    (r) =>
+      r.activo &&
+      (r.nombre.toLowerCase().includes(busquedaResponsable.toLowerCase()) ||
+        r.rol.toLowerCase().includes(busquedaResponsable.toLowerCase())) &&
+      (r.rol === "admin" || r.rol === "operario")
+  );
 
   const crearInvernadero = () => {
     if (!form.nombre || !form.descripcion || !form.responsable) return;
     const nuevo = {
       id: Date.now(),
-      nombre: form.nombre,
-      descripcion: form.descripcion,
-      responsable: form.responsable,
+      ...form,
       estado: "activo",
-      zonas_totales: form.zonas_totales,
-      zonas_activas: form.zonas_activas,
     };
     setInvernaderos([...invernaderos, nuevo]);
     setForm({
@@ -55,6 +68,7 @@ export default function InvernaderosPage() {
       zonas_totales: 0,
       zonas_activas: 0,
     });
+    setBusquedaResponsable("");
     setModalOpen(false);
   };
 
@@ -80,7 +94,9 @@ export default function InvernaderosPage() {
             className="bg-white rounded-2xl shadow p-6 flex flex-col gap-3 relative"
           >
             <div className="flex justify-between items-start">
-              <h2 className="text-2xl font-semibold text-green-800">{inv.nombre}</h2>
+              <h2 className="text-2xl font-semibold text-green-800">
+                {inv.nombre}
+              </h2>
               <div className="relative">
                 <button
                   onClick={() =>
@@ -117,7 +133,8 @@ export default function InvernaderosPage() {
 
             <p className="text-gray-500 text-sm">{inv.descripcion}</p>
             <p className="text-sm font-medium">
-              Responsable: <span className="text-gray-800">{inv.responsable}</span>
+              Responsable:{" "}
+              <span className="text-gray-800">{inv.responsable}</span>
             </p>
             <p className="text-sm font-medium">
               Estado:{" "}
@@ -167,15 +184,45 @@ export default function InvernaderosPage() {
                 setForm({ ...form, descripcion: e.target.value })
               }
             />
-            <input
-              className="w-full p-3 mb-3 border border-gray-300 rounded"
-              placeholder="Responsable"
-              value={form.responsable}
-              onChange={(e) =>
-                setForm({ ...form, responsable: e.target.value })
-              }
-            />
-            
+
+            {/* Buscador de responsable */}
+            <div className="mb-4">
+              <label className="block mb-1 text-sm font-medium text-gray-700">
+                Buscar Responsable
+              </label>
+              <div className="relative">
+                <MagnifyingGlassIcon className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Buscar responsable..."
+                  value={busquedaResponsable}
+                  onChange={(e) => setBusquedaResponsable(e.target.value)}
+                  className="w-full pl-10 p-3 border border-gray-300 rounded"
+                />
+              </div>
+              {busquedaResponsable && (
+                <ul className="border mt-1 rounded shadow-sm max-h-40 overflow-y-auto bg-white">
+                  {filtrados.length > 0 ? (
+                    filtrados.map((r) => (
+                      <li
+                        key={r.id}
+                        className="px-4 py-2 hover:bg-green-100 cursor-pointer"
+                        onClick={() => {
+                          setForm({ ...form, responsable: r.nombre });
+                          setBusquedaResponsable(r.nombre);
+                        }}
+                      >
+                        {r.nombre}{" "}
+                        <span className="text-xs text-gray-500">({r.rol})</span>
+                      </li>
+                    ))
+                  ) : (
+                    <li className="px-4 py-2 text-gray-500">No encontrado</li>
+                  )}
+                </ul>
+              )}
+            </div>
+
             <div className="flex justify-end gap-4">
               <button
                 onClick={() => setModalOpen(false)}
